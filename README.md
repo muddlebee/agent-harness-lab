@@ -38,6 +38,11 @@ Run the Inspect task (requires the evals extra and a configured OpenAI model):
 uv run inspect eval evals/financial_agent/inspect_task.py@financial_agent_eval
 ~~~
 
+That command is intentionally a live, paid run. It creates a fresh SQLite sandbox for each
+scenario, calls the actual OpenAI Agents SDK agent, and saves a log with separate answer,
+trajectory, expected-error, database-state, and efficiency scores. Regular pull requests run the
+offline reference suite only.
+
 ## The mental model
 
 ~~~mermaid
@@ -69,6 +74,7 @@ flowchart TD
 4. [Traces and telemetry](docs/03-traces-and-telemetry.md)
 5. [Evals and graders](docs/04-evals-and-graders.md)
 6. [The experiment loop](docs/05-experiment-loop.md)
+7. [M1: live eval bridge](docs/06-m1-live-eval-bridge.md)
 
 ## Intentionally not included yet
 
