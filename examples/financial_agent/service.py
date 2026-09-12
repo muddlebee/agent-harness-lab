@@ -74,6 +74,41 @@ class FinancialService:
         ).fetchone()
         return None if row is None else int(row["monthly_limit_paise"])
 
+    def search_transactions(self, user_id: str, merchant: str) -> list[dict[str, str | int]]:
+        self.failures.before("search_transactions")
+        rows = self.connection.execute(
+            """
+            SELECT occurred_on, category, merchant, amount_paise, status
+            FROM transactions
+            WHERE user_id = ? AND lower(merchant) LIKE lower(?)
+            ORDER BY occurred_on DESC
+            """,
+            (user_id, f"%{merchant}%"),
+        ).fetchall()
+        return [
+            {
+                "occurred_on": str(row["occurred_on"]),
+                "category": str(row["category"]),
+                "merchant": str(row["merchant"]),
+                "amount_paise": int(row["amount_paise"]),
+                "status": str(row["status"]),
+            }
+            for row in rows
+        ]
+
+    def balance(self, user_id: str) -> dict[str, str | int]:
+        self.failures.before("balance")
+        row = self.connection.execute(
+            "SELECT balance_paise, last_updated FROM account_syncs WHERE user_id = ?",
+            (user_id,),
+        ).fetchone()
+        if row is None:
+            raise LookupError("no connected account")
+        return {
+            "balance_paise": int(row["balance_paise"]),
+            "last_updated": str(row["last_updated"]),
+        }
+
 
 def rupees(paise: int) -> str:
     return f"₹{paise / 100:,.0f}"
