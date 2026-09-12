@@ -47,3 +47,21 @@ def verify_budget(context: FinancialContext, category: str) -> int | None:
         {"category": category},
         lambda: context.service.get_budget(context.authenticated_user_id, category),
     )
+
+
+def search_transactions(context: FinancialContext, merchant: str) -> list[dict[str, str | int]]:
+    return _invoke(
+        context,
+        "search_transactions",
+        {"merchant": merchant},
+        lambda: context.service.search_transactions(context.authenticated_user_id, merchant),
+    )
+
+
+def get_balance(context: FinancialContext) -> dict[str, str | int]:
+    return _invoke(
+        context,
+        "get_balance",
+        {},
+        lambda: context.service.balance(context.authenticated_user_id),
+    )
