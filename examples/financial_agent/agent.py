@@ -7,7 +7,14 @@ from __future__ import annotations
 from typing import Annotated
 
 from .models import FinancialContext
-from .tools import get_category_breakdown, get_monthly_spending, update_budget, verify_budget
+from .tools import (
+    get_balance,
+    get_category_breakdown,
+    get_monthly_spending,
+    search_transactions,
+    update_budget,
+    verify_budget,
+)
 
 SYSTEM_PROMPT = """You are a careful financial assistant for the authenticated user.
 Use tools for financial facts and calculations; never invent a number after a tool error.
@@ -48,8 +55,25 @@ def build_agent():
     ) -> int | None:
         return verify_budget(ctx.context, category)
 
+    @function_tool
+    def find_transactions(
+        ctx: RunContextWrapper[FinancialContext], merchant: Annotated[str, "merchant text to search"]
+    ) -> list[dict[str, str | int]]:
+        return search_transactions(ctx.context, merchant)
+
+    @function_tool
+    def account_balance(ctx: RunContextWrapper[FinancialContext]) -> dict[str, str | int]:
+        return get_balance(ctx.context)
+
     return Agent(
         name="Financial Assistant",
         instructions=SYSTEM_PROMPT,
-        tools=[monthly_spending, category_breakdown, set_budget, get_budget],
+        tools=[
+            monthly_spending,
+            category_breakdown,
+            set_budget,
+            get_budget,
+            find_transactions,
+            account_balance,
+        ],
     )
