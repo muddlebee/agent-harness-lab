@@ -1,0 +1,35 @@
+[project]
+name = "agent-harness-lab"
+version = "0.1.0"
+description = "A docs-first, runnable reference project for agent harnesses, tracing, and evals."
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.115",
+  "openai-agents>=0.8",
+  "pydantic>=2.10",
+  "uvicorn>=0.34",
+]
+
+[project.optional-dependencies]
+evals = ["inspect-ai>=0.3"]
+dev = ["pytest>=8.3", "ruff>=0.9"]
+
+[project.scripts]
+financial-agent = "examples.financial_agent.cli:main"
+financial-api = "examples.financial_agent.api:main"
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agent_harness_lab", "examples"]
+
+[tool.pytest.ini_options]
+pythonpath = [".", "src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
