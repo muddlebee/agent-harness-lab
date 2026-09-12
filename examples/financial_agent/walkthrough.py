@@ -2,8 +2,15 @@
 from __future__ import annotations
 
 from .models import FinancialContext
-from .service import month_before, rupees
-from .tools import get_category_breakdown, get_monthly_spending, update_budget, verify_budget
+from .service import SimulatedToolFailure, month_before, rupees
+from .tools import (
+    get_balance,
+    get_category_breakdown,
+    get_monthly_spending,
+    search_transactions,
+    update_budget,
+    verify_budget,
+)
 
 
 def explain_spending_spike(context: FinancialContext, month: str) -> str:
@@ -33,3 +40,34 @@ def set_and_verify_budget(context: FinancialContext, category: str, rupee_limit:
     if observed != rupee_limit * 100:
         raise RuntimeError("budget write did not persist")
     return f"Done — your {category} budget is now {rupees(observed)} per month."
+
+
+def explain_missing_merchant(context: FinancialContext, merchant: str) -> str:
+    transactions = search_transactions(context, merchant)
+    if not transactions:
+        return f"I could not find any posted transactions matching {merchant}."
+    total = sum(int(transaction["amount_paise"]) for transaction in transactions)
+    return f"I found {len(transactions)} transactions matching {merchant}, totaling {rupees(total)}."
+
+
+def disclose_stale_balance(context: FinancialContext) -> str:
+    balance = get_balance(context)
+    return (
+        f"The latest connected balance is {rupees(int(balance['balance_paise']))}, "
+        f"but it was last updated on {balance['last_updated']} and may be stale."
+    )
+
+
+def handle_failed_budget_write(context: FinancialContext, category: str, rupee_limit: int) -> str:
+    try:
+        update_budget(context, category, rupee_limit * 100)
+    except SimulatedToolFailure:
+        return (
+            f"I could not confirm the {category} budget update because the service timed out. "
+            "I have not claimed that the change succeeded."
+        )
+    return set_and_verify_budget(context, category, rupee_limit)
+
+
+def refuse_other_user_data() -> str:
+    return "I can only access the authenticated user's financial information, not Bob's."
