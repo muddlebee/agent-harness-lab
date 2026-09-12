@@ -3,6 +3,10 @@
 The offline runner takes a Scenario, builds a sandbox, runs a behavior, then applies small
 graders. See evals/financial_agent/runner.py.
 
+M1 defines five scenarios: spending spike, missing merchant data, stale balance, failed budget
+write, and a privacy boundary. Each scenario has a user question, failure plan, expected answer
+properties, required tools, call budget, and (when relevant) expected final database state.
+
 The spending scenario checks:
 
 ~~~text
@@ -12,22 +16,18 @@ no tool error     failure was not hidden
 efficient         no more than four tool calls
 ~~~
 
-The budget scenario adds a stronger property:
+The failed-write scenario adds stronger properties:
 
 ~~~text
-database state    the budget row is ₹10,000
-verified write    update_budget happened before verify_budget
+database state    the old budget row remains ₹1,000
+expected error    the timeout appears in the trace
 ~~~
 
 This avoids an overly brittle rule such as calls must occur in one exact order. Grade
 requirements — safe evidence, correct state, cost bounds — not every harmless implementation
 detail.
 
-The Inspect task lives in evals/financial_agent/inspect_task.py and establishes the standard
-Inspect shape:
-
-~~~text
-dataset + solver plan + scorer → saved eval log
-~~~
-
-The next iteration can bridge the actual live agent and attach custom state and trace scorers.
+The Inspect task in evals/financial_agent/inspect_task.py runs the actual OpenAI Agents SDK agent
+rather than duplicating the reference behavior. Its custom solver creates the sandbox and saves
+JSON-safe execution evidence in Inspect's state store. Separate custom scorers read that one
+record, so the model is not re-run for every score.
