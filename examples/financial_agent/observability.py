@@ -67,22 +67,34 @@ def configure_langfuse() -> Any | None:
 
 
 @contextmanager
-def observe_live_evaluation(scenario: Scenario) -> Iterator[Any | None]:
+def observe_live_evaluation(
+    scenario: Scenario, *, session_id: str | None = None
+) -> Iterator[Any | None]:
     """Create a privacy-preserving root span around one live evaluation scenario."""
     client = configure_langfuse()
     if client is None:
         yield None
         return
 
+    from langfuse import propagate_attributes
+
     input_data: dict[str, str] = {"scenario_id": scenario.id}
     if _capture_content():
         input_data["question"] = scenario.question
 
-    with client.start_as_current_observation(
+    metadata = {"scenario_id": scenario.id, "scenario_kind": scenario.kind}
+    if session_id is not None:
+        metadata["eval_run_id"] = session_id
+
+    # Set the session before creating the root observation so the root, its
+    # OpenInference children, and the resulting trace share the same grouping.
+    with propagate_attributes(
+        session_id=session_id
+    ), client.start_as_current_observation(
         as_type="agent",
         name="financial-agent.live-eval",
         input=input_data,
-        metadata={"scenario_id": scenario.id, "scenario_kind": scenario.kind},
+        metadata=metadata,
     ) as observation:
         yield observation
 

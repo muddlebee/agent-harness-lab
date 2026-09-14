@@ -80,6 +80,18 @@ The agent, model calls, tool calls, and one `financial-agent.live-eval` root spa
 Langfuse. The root span includes the scenario ID and five deterministic grader scores. Content
 capture is off by default because a real financial workload can contain sensitive data.
 
+Every `run-deepseek-eval.sh` invocation generates one Langfuse session ID. Each scenario remains
+an independent trace, while all scenarios from that Inspect invocation appear together in the
+session replay. The command prints the session ID; use it in Langfuse's Sessions view to compare
+the traces. Run the full five-scenario session with:
+
+~~~bash
+./scripts/run-deepseek-eval.sh
+~~~
+
+Set `FINANCIAL_AGENT_EVAL_RUN_ID` only when intentionally appending traces to an existing
+session.
+
 ## The mental model
 
 ~~~mermaid

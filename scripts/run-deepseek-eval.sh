@@ -30,6 +30,11 @@ load_from_bashrc DEEPSEEK_API_KEY
 : "${DEEPSEEK_API_KEY:?Set DEEPSEEK_API_KEY in ~/.bashrc or the current shell.}"
 : "${DEEPSEEK_MODEL:=deepseek-chat}"
 
+if [[ -z "${FINANCIAL_AGENT_EVAL_RUN_ID:-}" ]]; then
+  FINANCIAL_AGENT_EVAL_RUN_ID="financial-agent-eval-$(date -u +%Y%m%dT%H%M%SZ)-$$"
+fi
+export FINANCIAL_AGENT_EVAL_RUN_ID
+
 if [[ "${LANGFUSE_TRACING_ENABLED:-false}" == "true" ]]; then
   load_from_bashrc LANGFUSE_PUBLIC_KEY
   load_from_bashrc LANGFUSE_SECRET_KEY
@@ -50,6 +55,8 @@ args=(
   --log-level debug
   --log-level-transcript trace
 )
+
+printf 'Langfuse session: %s\n' "$FINANCIAL_AGENT_EVAL_RUN_ID"
 
 if [[ -n "${INSPECT_SAMPLE_ID:-}" ]]; then
   args+=(--sample-id "$INSPECT_SAMPLE_ID")

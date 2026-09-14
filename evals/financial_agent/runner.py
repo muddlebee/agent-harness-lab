@@ -112,7 +112,9 @@ def evaluate(scenario: Scenario) -> EvaluationResult:
     )
 
 
-async def evaluate_live(scenario: Scenario) -> EvaluationResult:
+async def evaluate_live(
+    scenario: Scenario, *, session_id: str | None = None
+) -> EvaluationResult:
     """Run the real SDK agent against the exact same sandbox and graders.
 
     This is intentionally not part of the default test suite: it calls a configured model.
@@ -123,7 +125,7 @@ async def evaluate_live(scenario: Scenario) -> EvaluationResult:
 
     langfuse = configure_langfuse()
     context, connection = build_context(scenario)
-    with observe_live_evaluation(scenario) as observation:
+    with observe_live_evaluation(scenario, session_id=session_id) as observation:
         run = await Runner.run(
             build_agent(),
             scenario.question,
