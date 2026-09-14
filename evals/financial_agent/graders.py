@@ -5,9 +5,9 @@ from typing import Any
 from examples.financial_agent.models import RunTrace
 
 
-def answer_mentions(answer: str, required: tuple[str, ...]) -> bool:
+def answer_mentions(answer: str, patterns: tuple[tuple[str, ...], ...]) -> bool:
     normalized = answer.lower()
-    return all(value.lower() in normalized for value in required)
+    return any(all(value.lower() in normalized for value in pattern) for pattern in patterns)
 
 
 def trace_used(trace: RunTrace, required: tuple[str, ...]) -> bool:

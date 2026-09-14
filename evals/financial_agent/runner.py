@@ -73,7 +73,7 @@ def grade(
     sandbox_state: dict[str, Any],
 ) -> dict[str, bool]:
     return {
-        "answer": answer_mentions(answer, scenario.expected_answer_fragments),
+        "answer": answer_mentions(answer, scenario.expected_answer_patterns),
         "trajectory": trace_used(trace, scenario.required_tools),
         "expected_tool_error": has_expected_tool_error(trace, scenario.expected_tool_error),
         "state": state_matches(sandbox_state, scenario.expected_dining_budget_paise),

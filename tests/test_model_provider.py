@@ -47,3 +47,4 @@ def test_agent_builds_with_the_deepseek_model(monkeypatch: pytest.MonkeyPatch) -
 
 def test_system_prompt_defines_the_sandbox_date() -> None:
     assert "2026-09-01" in SYSTEM_PROMPT
+    assert "could not confirm" in SYSTEM_PROMPT
