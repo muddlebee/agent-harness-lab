@@ -5,7 +5,7 @@
 - Keep changes small, explicit, and reversible; preserve the deterministic offline path.
 - Prefer the existing agent → tools → SQLite sandbox → trace → graders → Inspect eval loop over new frameworks or abstractions.
 - Use a fresh sandbox for each evaluation scenario. Do not weaken deterministic graders to accommodate a model failure; diagnose the trace first.
-- Treat live model calls as opt-in: they cost money and can be nondeterministic. Use the offline suite by default.
+- Do not run live DeepSeek evaluations unless the user explicitly asks. They cost money and can be nondeterministic; use the offline suite by default.
 
 ## Commands and validation
 
