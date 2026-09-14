@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
+from .model_provider import live_model_from_environment
 from .models import FinancialContext
 from .tools import (
     get_balance,
@@ -68,6 +69,7 @@ def build_agent():
     return Agent(
         name="Financial Assistant",
         instructions=SYSTEM_PROMPT,
+        model=live_model_from_environment(),
         tools=[
             monthly_spending,
             category_breakdown,
