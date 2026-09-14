@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from inspect_ai import Task, task
 from inspect_ai.dataset import Sample
+from inspect_ai.log import transcript
 from inspect_ai.model import ModelOutput
 from inspect_ai.scorer import Score, Target, mean, scorer
 from inspect_ai.solver import Generate, Solver, TaskState, solver
@@ -30,6 +31,7 @@ def run_openai_financial_agent() -> Solver:
         record = execution.as_dict()
         state.output = ModelOutput(completion=execution.answer)
         state.store.set(STORE_KEY, record)
+        transcript().info(record, source="financial_agent")
         state.completed = True
         return state
 

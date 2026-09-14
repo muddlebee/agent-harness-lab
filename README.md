@@ -43,6 +43,21 @@ scenario, calls the actual OpenAI Agents SDK agent, and saves a log with separat
 trajectory, expected-error, database-state, and efficiency scores. Regular pull requests run the
 offline reference suite only.
 
+### Run the DeepSeek baseline
+
+The local `.env` selects `deepseek-chat` at `https://api.deepseek.com`; it never contains a key.
+The helper reads `DEEPSEEK_API_KEY` from your current shell or `~/.bashrc`, runs samples one at a
+time for readable traces, and saves Inspect logs under `.inspect-logs/`.
+
+~~~bash
+./scripts/run-deepseek-eval.sh
+INSPECT_SAMPLE_ID=spending-spike-001 ./scripts/run-deepseek-eval.sh
+uv run inspect view start --log-dir .inspect-logs
+~~~
+
+Inspect's selected model labels the evaluation. The actual agent model is configured by
+`FINANCIAL_AGENT_PROVIDER`, `DEEPSEEK_MODEL`, and `DEEPSEEK_BASE_URL` in `.env`.
+
 ## The mental model
 
 ~~~mermaid

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from examples.financial_agent.agent import build_agent
 from examples.financial_agent.model_provider import live_model_from_environment
 
 
@@ -32,3 +33,13 @@ def test_deepseek_provider_requires_api_key(monkeypatch: pytest.MonkeyPatch) -> 
 
     with pytest.raises(RuntimeError, match="DEEPSEEK_API_KEY"):
         live_model_from_environment()
+
+
+def test_agent_builds_with_the_deepseek_model(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("FINANCIAL_AGENT_PROVIDER", "deepseek")
+    monkeypatch.setenv("DEEPSEEK_API_KEY", "test-key")
+
+    agent = build_agent()
+
+    assert agent.model.model == "deepseek-chat"
+    assert len(agent.tools) == 6

@@ -6,6 +6,11 @@ from __future__ import annotations
 
 from typing import Annotated
 
+try:
+    from agents import Agent, RunContextWrapper, function_tool
+except ImportError as error:  # pragma: no cover
+    raise RuntimeError("Install project dependencies with uv sync to use the live agent.") from error
+
 from .model_provider import live_model_from_environment
 from .models import FinancialContext
 from .tools import (
@@ -24,11 +29,6 @@ For a budget update, verify the write before claiming success. State data limita
 
 
 def build_agent():
-    try:
-        from agents import Agent, RunContextWrapper, function_tool
-    except ImportError as error:  # pragma: no cover
-        raise RuntimeError("Install project dependencies with uv sync to use the live agent.") from error
-
     @function_tool
     def monthly_spending(
         ctx: RunContextWrapper[FinancialContext], month: Annotated[str, "YYYY-MM"]

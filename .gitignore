@@ -3,6 +3,7 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 .env
+.inspect-logs/
 *.db
 *.sqlite
 *.jsonl
