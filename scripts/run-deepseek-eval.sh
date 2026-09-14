@@ -11,13 +11,33 @@ if [[ -f .env ]]; then
   set +a
 fi
 
-if [[ -z "${DEEPSEEK_API_KEY:-}" && -f "$HOME/.bashrc" ]]; then
-  DEEPSEEK_API_KEY="$(bash -ic 'printf %s "${DEEPSEEK_API_KEY:-}"' 2>/dev/null)"
-  export DEEPSEEK_API_KEY
-fi
+load_from_bashrc() {
+  local name="$1"
+  local value
+
+  if [[ -n "${!name:-}" || ! -f "$HOME/.bashrc" ]]; then
+    return
+  fi
+  value="$(bash -ic "printf %s \"\${$name:-}\"" 2>/dev/null)"
+  if [[ -n "$value" ]]; then
+    printf -v "$name" '%s' "$value"
+    export "$name"
+  fi
+}
+
+load_from_bashrc DEEPSEEK_API_KEY
 
 : "${DEEPSEEK_API_KEY:?Set DEEPSEEK_API_KEY in ~/.bashrc or the current shell.}"
 : "${DEEPSEEK_MODEL:=deepseek-chat}"
+
+if [[ "${LANGFUSE_TRACING_ENABLED:-false}" == "true" ]]; then
+  load_from_bashrc LANGFUSE_PUBLIC_KEY
+  load_from_bashrc LANGFUSE_SECRET_KEY
+  : "${LANGFUSE_PUBLIC_KEY:?Set LANGFUSE_PUBLIC_KEY in ~/.bashrc or the current shell.}"
+  : "${LANGFUSE_SECRET_KEY:?Set LANGFUSE_SECRET_KEY in ~/.bashrc or the current shell.}"
+  : "${LANGFUSE_BASE_URL:=https://cloud.langfuse.com}"
+  export LANGFUSE_BASE_URL
+fi
 
 log_dir="${INSPECT_LOG_DIR:-$repo_root/.inspect-logs}"
 mkdir -p "$log_dir"

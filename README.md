@@ -58,6 +58,28 @@ uv run inspect view start --log-dir .inspect-logs
 Inspect's selected model labels the evaluation. The actual agent model is configured by
 `FINANCIAL_AGENT_PROVIDER`, `DEEPSEEK_MODEL`, and `DEEPSEEK_BASE_URL` in `.env`.
 
+### Trace live runs in Langfuse
+
+Install the optional observability dependencies, then add Langfuse credentials to the ignored
+local `.env` file (the runner also supports environment variables or `~/.bashrc` as a fallback):
+
+~~~bash
+uv sync --extra observability
+~~~
+
+Set the following in `.env` before running a synthetic scenario:
+
+~~~bash
+LANGFUSE_TRACING_ENABLED=true
+LANGFUSE_PUBLIC_KEY=pk-lf-...
+LANGFUSE_SECRET_KEY=sk-lf-...
+LANGFUSE_CAPTURE_CONTENT=true
+~~~
+
+The agent, model calls, tool calls, and one `financial-agent.live-eval` root span appear in
+Langfuse. The root span includes the scenario ID and five deterministic grader scores. Content
+capture is off by default because a real financial workload can contain sensitive data.
+
 ## The mental model
 
 ~~~mermaid

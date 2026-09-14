@@ -6,6 +6,10 @@ from typing import Any
 
 from examples.financial_agent.db import create_sandbox, seed_maya_spending_spike
 from examples.financial_agent.models import FinancialContext, RunTrace
+from examples.financial_agent.observability import (
+    configure_langfuse,
+    observe_live_evaluation,
+)
 from examples.financial_agent.service import FailurePlan, FinancialService
 from examples.financial_agent.walkthrough import (
     disclose_stale_balance,
@@ -117,20 +121,28 @@ async def evaluate_live(scenario: Scenario) -> EvaluationResult:
 
     from examples.financial_agent.agent import build_agent
 
+    langfuse = configure_langfuse()
     context, connection = build_context(scenario)
-    run = await Runner.run(
-        build_agent(),
-        scenario.question,
-        context=context,
-        max_turns=8,
-        run_config=RunConfig(tracing_disabled=True),
-    )
-    answer = str(run.final_output)
-    sandbox_state = snapshot(connection)
+    with observe_live_evaluation(scenario) as observation:
+        run = await Runner.run(
+            build_agent(),
+            scenario.question,
+            context=context,
+            max_turns=8,
+            run_config=RunConfig(tracing_disabled=langfuse is None),
+        )
+        answer = str(run.final_output)
+        sandbox_state = snapshot(connection)
+        checks = grade(scenario, answer, context.trace, sandbox_state)
+        if observation is not None:
+            observation.update(output={"checks": checks, "tool_calls": len(context.trace.events)})
+            for check, passed in checks.items():
+                observation.score(name=f"grader.{check}", value=float(passed))
+
     return EvaluationResult(
         scenario_id=scenario.id,
         answer=answer,
-        checks=grade(scenario, answer, context.trace, sandbox_state),
+        checks=checks,
         trace=context.trace,
         sandbox_state=sandbox_state,
         mode="live",
