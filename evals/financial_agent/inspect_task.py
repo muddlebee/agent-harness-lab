@@ -1,7 +1,7 @@
 """Inspect bridge for the real Agents SDK financial agent.
 
 Run with:
-  ./scripts/run-deepseek-eval.sh
+  ./scripts/run-live-eval.sh
 
 Inspect stores one JSON-safe execution record per sample. Each scorer then evaluates a different
 property of the same answer, trace, and final sandbox state without repeating the model call.

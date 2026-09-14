@@ -23,6 +23,16 @@ This distinction is deliberate. The reference suite is not proof that an LLM wil
 proves that our world and judge are wired correctly. The live task then measures the actual
 agent inside that world.
 
+## OpenRouter configuration
+
+The default local configuration routes `deepseek/deepseek-chat` through OpenRouter's
+OpenAI-compatible endpoint. Set `FINANCIAL_AGENT_PROVIDER=openrouter`,
+`FINANCIAL_AGENT_MODEL=deepseek/deepseek-chat`, and
+`FINANCIAL_AGENT_BASE_URL=https://openrouter.ai/api/v1` in `.env`, then provide the common
+`FINANCIAL_AGENT_API_KEY` through the shell or `~/.bashrc`. Run the existing helper with
+`./scripts/run-live-eval.sh`; it detects the selected provider and labels the Inspect run as
+an OpenRouter model.
+
 ## The five M1 worlds
 
 | Scenario | Failure it prevents |

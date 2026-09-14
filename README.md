@@ -43,20 +43,26 @@ scenario, calls the actual OpenAI Agents SDK agent, and saves a log with separat
 trajectory, expected-error, database-state, and efficiency scores. Regular pull requests run the
 offline reference suite only.
 
-### Run the DeepSeek baseline
+### Run the OpenRouter DeepSeek baseline
 
-The local `.env` selects `deepseek-chat` at `https://api.deepseek.com`; it never contains a key.
-The helper reads `DEEPSEEK_API_KEY` from your current shell or `~/.bashrc`, runs samples one at a
-time for readable traces, and saves Inspect logs under `logs/`.
+The local `.env` selects OpenRouter's `deepseek/deepseek-chat` model at
+`https://openrouter.ai/api/v1`; it never contains a key. Create an API key in the
+[OpenRouter dashboard](https://openrouter.ai/settings/keys), then export the provider-neutral
+`FINANCIAL_AGENT_API_KEY` in your current shell or `~/.bashrc`. The helper runs samples one at a
+time for readable traces and saves Inspect logs under `logs/`.
 
 ~~~bash
-./scripts/run-deepseek-eval.sh
-INSPECT_SAMPLE_ID=spending-spike-001 ./scripts/run-deepseek-eval.sh
+./scripts/run-live-eval.sh
+INSPECT_SAMPLE_ID=spending-spike-001 ./scripts/run-live-eval.sh
 uv run inspect view start --log-dir logs
 ~~~
 
 Inspect's selected model labels the evaluation. The actual agent model is configured by
-`FINANCIAL_AGENT_PROVIDER`, `DEEPSEEK_MODEL`, and `DEEPSEEK_BASE_URL` in `.env`.
+`FINANCIAL_AGENT_PROVIDER`, `FINANCIAL_AGENT_MODEL`, and `FINANCIAL_AGENT_BASE_URL` in `.env`.
+
+To keep using DeepSeek directly, set `FINANCIAL_AGENT_PROVIDER=deepseek` and configure
+the same three `FINANCIAL_AGENT_*` variables with `deepseek-chat` and
+`https://api.deepseek.com`.
 
 ### Trace live runs in Langfuse
 
@@ -80,13 +86,13 @@ The agent, model calls, tool calls, and one `financial-agent.live-eval` root spa
 Langfuse. The root span includes the scenario ID and five deterministic grader scores. Content
 capture is off by default because a real financial workload can contain sensitive data.
 
-Every `run-deepseek-eval.sh` invocation generates one Langfuse session ID. Each scenario remains
+Every `run-live-eval.sh` invocation generates one Langfuse session ID. Each scenario remains
 an independent trace, while all scenarios from that Inspect invocation appear together in the
 session replay. The command prints the session ID; use it in Langfuse's Sessions view to compare
 the traces. Run the full five-scenario session with:
 
 ~~~bash
-./scripts/run-deepseek-eval.sh
+./scripts/run-live-eval.sh
 ~~~
 
 Set `FINANCIAL_AGENT_EVAL_RUN_ID` only when intentionally appending traces to an existing
