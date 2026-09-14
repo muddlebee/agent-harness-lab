@@ -39,7 +39,7 @@ if [[ "${LANGFUSE_TRACING_ENABLED:-false}" == "true" ]]; then
   export LANGFUSE_BASE_URL
 fi
 
-log_dir="${INSPECT_LOG_DIR:-$repo_root/.inspect-logs}"
+log_dir="${INSPECT_LOG_DIR:-$repo_root/logs}"
 mkdir -p "$log_dir"
 
 args=(

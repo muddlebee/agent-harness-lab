@@ -47,12 +47,12 @@ offline reference suite only.
 
 The local `.env` selects `deepseek-chat` at `https://api.deepseek.com`; it never contains a key.
 The helper reads `DEEPSEEK_API_KEY` from your current shell or `~/.bashrc`, runs samples one at a
-time for readable traces, and saves Inspect logs under `.inspect-logs/`.
+time for readable traces, and saves Inspect logs under `logs/`.
 
 ~~~bash
 ./scripts/run-deepseek-eval.sh
 INSPECT_SAMPLE_ID=spending-spike-001 ./scripts/run-deepseek-eval.sh
-uv run inspect view start --log-dir .inspect-logs
+uv run inspect view start --log-dir logs
 ~~~
 
 Inspect's selected model labels the evaluation. The actual agent model is configured by
