@@ -38,6 +38,10 @@ def configure_langfuse() -> Any | None:
     if missing:
         raise RuntimeError(f"Langfuse tracing is enabled but missing: {', '.join(missing)}.")
 
+    # Keep a local evaluation from silently mixing with production traffic. A
+    # deployment can override this before process startup.
+    os.environ.setdefault("LANGFUSE_TRACING_ENVIRONMENT", "development")
+
     try:
         from langfuse import get_client
         from openinference.instrumentation import TraceConfig
