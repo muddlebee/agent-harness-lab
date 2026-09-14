@@ -6,7 +6,9 @@ from datetime import date
 
 def create_sandbox() -> sqlite3.Connection:
     """Create a fresh, known world for exactly one run."""
-    connection = sqlite3.connect(":memory:")
+    # The Agents SDK executes synchronous function tools in worker threads.
+    # SQLite is serialized in this Python build, so one per-run connection can safely serve them.
+    connection = sqlite3.connect(":memory:", check_same_thread=False)
     connection.row_factory = sqlite3.Row
     connection.executescript(
         """

@@ -1,3 +1,5 @@
+from concurrent.futures import ThreadPoolExecutor
+
 from examples.financial_agent.db import create_sandbox, seed_maya_spending_spike
 from examples.financial_agent.service import FinancialService
 
@@ -19,3 +21,15 @@ def test_pending_transactions_are_not_spend() -> None:
         VALUES ('maya', '2026-08-29', 'shopping', 'Pending Shop', 3_000_000, 'pending')"""
     )
     assert FinancialService(connection).monthly_spending("maya", "2026-08") == 4_990_000
+
+
+def test_sandbox_connection_is_usable_from_a_function_tool_worker() -> None:
+    connection = create_sandbox()
+    seed_maya_spending_spike(connection)
+
+    with ThreadPoolExecutor(max_workers=1) as executor:
+        total = executor.submit(
+            lambda: connection.execute("SELECT COUNT(*) FROM transactions").fetchone()[0]
+        ).result()
+
+    assert total == 11

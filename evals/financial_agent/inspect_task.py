@@ -1,7 +1,7 @@
-"""Inspect bridge for the real OpenAI Agents SDK financial agent.
+"""Inspect bridge for the real Agents SDK financial agent.
 
 Run with:
-  OPENAI_API_KEY=... uv run inspect eval evals/financial_agent/inspect_task.py@financial_agent_eval
+  ./scripts/run-deepseek-eval.sh
 
 Inspect stores one JSON-safe execution record per sample. Each scorer then evaluates a different
 property of the same answer, trace, and final sandbox state without repeating the model call.
@@ -15,14 +15,14 @@ from inspect_ai.model import ModelOutput
 from inspect_ai.scorer import Score, Target, mean, scorer
 from inspect_ai.solver import Generate, Solver, TaskState, solver
 
-from .runner import evaluate_live
-from .scenarios import SCENARIOS, by_id
+from evals.financial_agent.runner import evaluate_live
+from evals.financial_agent.scenarios import SCENARIOS, by_id
 
 STORE_KEY = "agent_harness_execution"
 
 
 @solver
-def run_openai_financial_agent() -> Solver:
+def run_financial_agent() -> Solver:
     """Create a fresh SQLite sandbox and execute the real agent for every Inspect sample."""
 
     async def solve(state: TaskState, generate: Generate) -> TaskState:
@@ -68,7 +68,7 @@ def financial_agent_eval() -> Task:
     ]
     return Task(
         dataset=dataset,
-        solver=run_openai_financial_agent(),
+        solver=run_financial_agent(),
         scorer=[
             scorecard("answer"),
             scorecard("trajectory"),

@@ -113,12 +113,18 @@ async def evaluate_live(scenario: Scenario) -> EvaluationResult:
 
     This is intentionally not part of the default test suite: it calls a configured model.
     """
-    from agents import Runner
+    from agents import RunConfig, Runner
 
     from examples.financial_agent.agent import build_agent
 
     context, connection = build_context(scenario)
-    run = await Runner.run(build_agent(), scenario.question, context=context, max_turns=8)
+    run = await Runner.run(
+        build_agent(),
+        scenario.question,
+        context=context,
+        max_turns=8,
+        run_config=RunConfig(tracing_disabled=True),
+    )
     answer = str(run.final_output)
     sandbox_state = snapshot(connection)
     return EvaluationResult(
