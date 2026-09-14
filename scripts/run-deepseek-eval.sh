@@ -29,7 +29,6 @@ args=(
   --log-dir "$log_dir"
   --log-level debug
   --log-level-transcript trace
-  --ctl-server=keep
 )
 
 if [[ -n "${INSPECT_SAMPLE_ID:-}" ]]; then
